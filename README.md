@@ -33,13 +33,13 @@ Within the "sample-repo" repository -> click "Upload object" -> click "Choose fi
 
 
 
-Now that we've uploaded the file, first, you'll be see it in the stage area (uncommited):
+Now that we've uploaded the file, first, you'll see it in the stage area (uncommitted):
 ```sh
 # CLI
 lakectl diff lakefs://sample-repo/main
 
 # UI
-Within the "sample-repo" repository -> click "Uncommited changes".
+Within the "sample-repo" repository -> click "Uncommitted changes".
 ```
 
 Great! now let's try to commit that file:
@@ -48,7 +48,7 @@ Great! now let's try to commit that file:
 lakectl commit lakefs://sample-repo/main --message "Test Commit"
 
 # UI
-Within the "sample-repo" repository -> click "Uncommited changes" -> click "Commit Changes" -> click "Commit Changes".
+Within the "sample-repo" repository -> click "Uncommitted changes" -> click "Commit Changes" -> click "Commit Changes".
 ```
 
 Ouch! we were caught in the act of trying to commit to `main` without the required attributes `owner` and `environment`! 
@@ -69,16 +69,16 @@ Let's retry that action, this time, with the required attributes:
 lakectl commit lakefs://sample-repo/main --message "Test Commit" --meta owner="John Doe",environment="production"
 
 # UI
-Within the "sample-repo" repository -> click "Uncommited changes" -> click "Commit Changes" -> click "+ Add Metadata field" -> insert key: "owner", value: "John Doe" -> click "+ Add Metadata field" -> insert key: "environment", value: "production" -> click "Commit Changes".
+Within the "sample-repo" repository -> click "Uncommitted changes" -> click "Commit Changes" -> click "+ Add Metadata field" -> insert key: "owner", value: "John Doe" -> click "+ Add Metadata field" -> insert key: "environment", value: "production" -> click "Commit Changes".
 ```
 
 Congrats! you've just made the first commit using the `pre-commit metadata validator` hook!
 
-Let's jump on to more advanced example.
+Let's jump on to a more advanced example.
 
 Now, we'll try to sneak some private information into the main branch!
 
-We've created a sneaky-branch for you to explore the second hook, we'll try merging a branch which contains a dangerous files (a file with the `email` column within a parquet file)
+We've created a sneaky-branch for you to explore the second hook, we'll try merging a branch that contains a dangerous file (a file with the `email` column within a parquet file)
 
 Let's try to merge that branch into main:
 ```sh
@@ -96,7 +96,7 @@ update branch main: pre-merge hook aborted, run id '5kepi1b1nilh6brjhmmg': 1 err
 
 Phew! we dodged a bullet here, no PII is present on our main branch.
 
-That's all for our hooks demonstration, if you're interested on understading more about hooks, [read our docs](https://docs.lakefs.io/hooks/).
+That's all for our hooks demonstration, if you're interested in understanding more about hooks, [read our docs](https://docs.lakefs.io/hooks/).
 
 ## Data Sets Examples
 

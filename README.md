@@ -1,5 +1,74 @@
 # Welcome to lakeFS Cloud Sample Repository
 
+## What is lakeFS?
+lakeFS is an open source data version control for data lakes.
+It enables zero copy Dev / Test isolated environments, continuous quality validation, atomic rollback on bad data, reproducibility, and more.
+
+## Getting Started
+
+> **_NOTE:_** The hooks example below can be done by using the CLI or the UI, if you'd like to use the CLI, make sure to have [lakectl](https://docs.lakefs.io/reference/commands.html#configuring-credentials-and-api-endpoint) and [spark s3a](https://docs.lakefs.io/integrations/spark.html#access-lakefs-using-the-s3a-gateway) configured correctly.
+
+We'll start by covering lakeFS basics.
+
+Let's start by creating a branch:
+```sh
+# CLI
+$ lakectl branch create lakefs://sample-repo/my-branch -s lakefs://sample-repo/main
+
+# UI
+Within the "sample-repo" repository -> click "Branches" -> click "Create Branch" -> fill in "my-branch" for Branch Name -> click "Create".
+```
+
+Great! you'v created your first branch, you should now see it in the list of branches!
+
+Now let's try uploading an object to the `my-branch` branch:
+```sh
+# CLI
+$ lakectl fs upload lakefs://sample-repo/my-branch/file -s /path/to/some/file
+
+# UI
+Within the "sample-repo" repository -> click "Objects" -> pick "my-branch" from the branch drop down -> Click "Upload Object" -> Click "Choose file" and pick a file to upload -> click "Upload".
+```
+
+Now that we've uploaded the file, first, you'll see it in the stage area (uncommitted):
+```sh
+# CLI
+lakectl diff lakefs://sample-repo/my-branch
+
+# UI
+Within the "sample-repo" repository -> click "Objects" -> pick "my-branch" from the branch drop down -> click "Uncommitted changes".
+```
+
+Let's commit the file:
+```sh
+# CLI
+lakectl commit lakefs://sample-repo/my-branch
+
+# UI
+Still within the "my-branch" Uncommitted Changes -> click "Commit Changes" -> click once again "Commit Changes".
+```
+
+Let's explore some data 
+> **_NOTE:_** for this example we'll demonstrate how to query parquet files using `DuckDB` from within the UI.
+```sh
+Within the "sample-repo" repository -> pick the "main" branch from the drop down -> Click the "world-cities-database-population" directory -> Click the "raw" directory -> Click the "part-00000-tid-1091049596617008918-5f8b8e42-730c-4cc2-ba06-3e5f4a4acff6-22194-1-c000.snappy.parquet" parquet file.
+```
+
+Now you should see the parquet file with a standard SQL query displaying the parquet file as table, with it's columns.
+
+Let's try to get some insights from this parquet, let's try to find out how many people live in the biggest city in each country, replace the SQL query with the one below and click "Execute":
+```sql
+SELECT 
+  country_name_en, max(population) AS biggest_city_pop
+FROM
+  read_parquet(lakefs_object('sample-repo', 'main', 'world-cities-database-population/raw/part-00000-tid-1091049596617008918-5f8b8e42-730c-4cc2-ba06-3e5f4a4acff6-22194-1-c000.snappy.parquet')) 
+GROUP BY
+ country_name_en
+ORDER BY
+   biggest_city_pop DESC
+```
+
+That was cool, wasn't it?
 
 ## Sample Data
 
@@ -15,10 +84,6 @@ We've also included a couple of hooks to help you get started:
 
 ## Diving Into Hooks
 
-> **_NOTE:_** The hooks example below can be done by using the CLI or the UI, if you'd like to use the CLI, make sure to have [lakectl](https://docs.lakefs.io/reference/commands.html#configuring-credentials-and-api-endpoint) and [spark s3a](https://docs.lakefs.io/integrations/spark.html#access-lakefs-using-the-s3a-gateway) configured correctly.
-
-
-
 Let's start by trying our first hook, we'll try to upload a file to the `main` branch and commit it.
 
 Upload a file, make sure to replace `/path/to/some/file` to any arbitrary file you'd like, it can be an empty one for the example:
@@ -30,7 +95,6 @@ $ lakectl fs upload lakefs://sample-repo/main/test -s /path/to/some/file
 # UI
 Within the "sample-repo" repository -> click "Upload object" -> click "Choose file" -> pick a file from your filesystem -> click "Upload".
 ```
-
 
 
 Now that we've uploaded the file, first, you'll see it in the stage area (uncommitted):

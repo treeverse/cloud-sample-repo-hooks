@@ -4,6 +4,14 @@
 lakeFS is an open source data version control for data lakes.
 It enables zero copy Dev / Test isolated environments, continuous quality validation, atomic rollback on bad data, reproducibility, and more.
 
+## Introduction
+Welcome to lakeFS sample-repo!
+We've included step-by-step instructions, [pre-loaded data](#data-sets-examples) sets and [hooks](https://docs.lakefs.io/hooks/overview.html) to get familiar with lakeFS [versioning model](https://docs.lakefs.io/understand/model.html) and its capabilities.
+
+We'll start by going over [lakeFS basic capabilities](#getting-started), such as creating a branch, uploading an object and committing that object.
+
+We also included instructions on how to use [lakeFS Hooks](#diving-into-hooks), which demonstrates how to govern the data you merge into your main branch, for instance, making sure no PII is presented on the main branch, and that every commit to main includes certain metadata attributes.
+
 ## Getting Started
 
 > **_NOTE:_** The hooks example below can be done by using the CLI or the UI, if you'd like to use the CLI, make sure to have [lakectl](https://docs.lakefs.io/reference/commands.html#configuring-credentials-and-api-endpoint) and [spark s3a](https://docs.lakefs.io/integrations/spark.html#access-lakefs-using-the-s3a-gateway) configured correctly.
@@ -70,18 +78,6 @@ ORDER BY
 
 That was cool, wasn't it?
 
-## Sample Data
-
-For your convenience, we've created a first repository with some sample data:
-
-* [world-cities-database-population](https://www.kaggle.com/datasets/arslanali4343/world-cities-database-population-oct2022) - which contains information on the different cities and population (Licensed: Database Contents License (DbCL) v1.0)
-
-* [nyc-tlc-trip-data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) - which contains information on New York City Yellow and Green taxi trip records.
-
-We've also included a couple of hooks to help you get started:
-* [pre-commit metdata-validation hook](./_lakefs_actions/pre-commit-metadata-validation.yaml) - which will verify on each commit to `stage` and `main` branches, that the following metadata attributes are present: `owner` (free text) and `environment` (must be one of "production", "staging" or "development").
-* [pre-merge format-validation hook](./_lakefs_actions/pre-merge-format-validation.yaml) - which will verify on each merge to the `main` branch, that the following PII (Personal Identifiable Information) columns are **missing** within the `tables/customers/` and `tables/orders/` locations.
-
 ## Diving Into Hooks
 
 Let's start by trying our first hook, we'll try to upload a file to the `main` branch and commit it.
@@ -95,7 +91,6 @@ $ lakectl fs upload lakefs://sample-repo/main/test -s /path/to/some/file
 # UI
 Within the "sample-repo" repository -> click "Upload object" -> click "Choose file" -> pick a file from your filesystem -> click "Upload".
 ```
-
 
 Now that we've uploaded the file, first, you'll see it in the stage area (uncommitted):
 ```sh
@@ -161,6 +156,18 @@ update branch main: pre-merge hook aborted, run id '5kepi1b1nilh6brjhmmg': 1 err
 Phew! we dodged a bullet here, no PII is present on our main branch.
 
 That's all for our hooks demonstration, if you're interested in understanding more about hooks, [read our docs](https://docs.lakefs.io/hooks/).
+
+## Sample Data
+
+For your convenience, we've created a first repository with some sample data:
+
+* [world-cities-database-population](https://www.kaggle.com/datasets/arslanali4343/world-cities-database-population-oct2022) - which contains information on the different cities and population (Licensed: Database Contents License (DbCL) v1.0)
+
+* [nyc-tlc-trip-data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) - which contains information on New York City Yellow and Green taxi trip records.
+
+We've also included a couple of hooks to help you get started:
+* [pre-commit metdata-validation hook](./_lakefs_actions/pre-commit-metadata-validation.yaml) - which will verify on each commit to `stage` and `main` branches, that the following metadata attributes are present: `owner` (free text) and `environment` (must be one of "production", "staging" or "development").
+* [pre-merge format-validation hook](./_lakefs_actions/pre-merge-format-validation.yaml) - which will verify on each merge to the `main` branch, that the following PII (Personal Identifiable Information) columns are **missing** within the `tables/customers/` and `tables/orders/` locations.
 
 ## Data Sets Examples
 

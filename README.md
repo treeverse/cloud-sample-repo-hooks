@@ -1,23 +1,84 @@
 # Welcome to lakeFS Cloud Sample Repository
 
+## What is lakeFS?
+lakeFS is an open source data version control for data lakes.
+It enables zero copy Dev / Test isolated environments, continuous quality validation, atomic rollback on bad data, reproducibility, and more.
 
-## Sample Data
+## Introduction
+Welcome to lakeFS sample-repo!
+We've included step-by-step instructions, [pre-loaded data](#data-sets-examples) sets and [hooks](https://docs.lakefs.io/hooks/overview.html) to get familiar with lakeFS [versioning model](https://docs.lakefs.io/understand/model.html) and its capabilities.
 
-For your convenience, we've created a first repository with some sample data:
+We'll start by going over [lakeFS basic capabilities](#getting-started), such as creating a branch, uploading an object and committing that object.
 
-* [world-cities-database-population](https://www.kaggle.com/datasets/arslanali4343/world-cities-database-population-oct2022) - which contains information on the different cities and population (Licensed: Database Contents License (DbCL) v1.0)
+We also included instructions on how to use [lakeFS Hooks](#diving-into-hooks), which demonstrates how to govern the data you merge into your main branch, for instance, making sure no PII is presented on the main branch, and that every commit to main includes certain metadata attributes.
 
-* [nyc-tlc-trip-data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) - which contains information on New York City Yellow and Green taxi trip records.
-
-We've also included a couple of hooks to help you get started:
-* [pre-commit metdata-validation hook](./_lakefs_actions/pre-commit-metadata-validation.yaml) - which will verify on each commit to `stage` and `main` branches, that the following metadata attributes are present: `owner` (free text) and `environment` (must be one of "production", "staging" or "development").
-* [pre-merge format-validation hook](./_lakefs_actions/pre-merge-format-validation.yaml) - which will verify on each merge to the `main` branch, that the following PII (Personal Identifiable Information) columns are **missing** within the `tables/customers/` and `tables/orders/` locations.
-
-## Diving Into Hooks
+## Getting Started
 
 > **_NOTE:_** The hooks example below can be done by using the CLI or the UI, if you'd like to use the CLI, make sure to have [lakectl](https://docs.lakefs.io/reference/commands.html#configuring-credentials-and-api-endpoint) and [spark s3a](https://docs.lakefs.io/integrations/spark.html#access-lakefs-using-the-s3a-gateway) configured correctly.
 
+We'll start by covering lakeFS basics.
 
+Let's start by creating a branch:
+```sh
+# CLI
+$ lakectl branch create lakefs://sample-repo/my-branch -s lakefs://sample-repo/main
+
+# UI
+Within the "sample-repo" repository -> click "Branches" -> click "Create Branch" -> fill in "my-branch" for Branch Name -> click "Create".
+```
+
+Great! you'v created your first branch, you should now see it in the list of branches!
+
+Now let's try uploading an object to the `my-branch` branch:
+```sh
+# CLI
+$ lakectl fs upload lakefs://sample-repo/my-branch/file -s /path/to/some/file
+
+# UI
+Within the "sample-repo" repository -> click "Objects" -> pick "my-branch" from the branch drop down -> Click "Upload Object" -> Click "Choose file" and pick a file to upload -> click "Upload".
+```
+
+Now that we've uploaded the file, first, you'll see it in the stage area (uncommitted):
+```sh
+# CLI
+lakectl diff lakefs://sample-repo/my-branch
+
+# UI
+Within the "sample-repo" repository -> click "Objects" -> pick "my-branch" from the branch drop down -> click "Uncommitted changes".
+```
+
+Let's commit the file:
+```sh
+# CLI
+lakectl commit lakefs://sample-repo/my-branch
+
+# UI
+Still within the "my-branch" Uncommitted Changes -> click "Commit Changes" -> click once again "Commit Changes".
+```
+
+Let's explore some data 
+> **_NOTE:_** for this example we'll demonstrate how to query parquet files using `DuckDB` from within the UI.
+```sh
+Within the "sample-repo" repository -> pick the "main" branch from the drop down -> Click the "world-cities-database-population" directory -> Click the "raw" directory -> Click the "part-00000-tid-1091049596617008918-5f8b8e42-730c-4cc2-ba06-3e5f4a4acff6-22194-1-c000.snappy.parquet" parquet file.
+```
+
+Now you should see the parquet file with a standard SQL query displaying the parquet file as table, with it's columns.
+
+Let's try to get some insights from this parquet, let's try to find out how many people live in the biggest city in each country, replace the SQL query with the one below and click "Execute":
+```sql
+SELECT 
+  country_name_en, max(population) AS biggest_city_pop
+FROM
+  read_parquet(lakefs_object('sample-repo', 'main', 'world-cities-database-population/raw/part-00000-tid-1091049596617008918-5f8b8e42-730c-4cc2-ba06-3e5f4a4acff6-22194-1-c000.snappy.parquet')) 
+GROUP BY
+ country_name_en
+ORDER BY
+   biggest_city_pop DESC
+```
+
+That was cool, wasn't it?
+
+## Diving Into Hooks
 
 Let's start by trying our first hook, we'll try to upload a file to the `main` branch and commit it.
 
@@ -30,8 +91,6 @@ $ lakectl fs upload lakefs://sample-repo/main/test -s /path/to/some/file
 # UI
 Within the "sample-repo" repository -> click "Upload object" -> click "Choose file" -> pick a file from your filesystem -> click "Upload".
 ```
-
-
 
 Now that we've uploaded the file, first, you'll see it in the stage area (uncommitted):
 ```sh
@@ -97,6 +156,18 @@ update branch main: pre-merge hook aborted, run id '5kepi1b1nilh6brjhmmg': 1 err
 Phew! we dodged a bullet here, no PII is present on our main branch.
 
 That's all for our hooks demonstration, if you're interested in understanding more about hooks, [read our docs](https://docs.lakefs.io/hooks/).
+
+## Sample Data
+
+For your convenience, we've created a first repository with some sample data:
+
+* [world-cities-database-population](https://www.kaggle.com/datasets/arslanali4343/world-cities-database-population-oct2022) - which contains information on the different cities and population (Licensed: Database Contents License (DbCL) v1.0)
+
+* [nyc-tlc-trip-data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) - which contains information on New York City Yellow and Green taxi trip records.
+
+We've also included a couple of hooks to help you get started:
+* [pre-commit metdata-validation hook](./_lakefs_actions/pre-commit-metadata-validation.yaml) - which will verify on each commit to `stage` and `main` branches, that the following metadata attributes are present: `owner` (free text) and `environment` (must be one of "production", "staging" or "development").
+* [pre-merge format-validation hook](./_lakefs_actions/pre-merge-format-validation.yaml) - which will verify on each merge to the `main` branch, that the following PII (Personal Identifiable Information) columns are **missing** within the `tables/customers/` and `tables/orders/` locations.
 
 ## Data Sets Examples
 

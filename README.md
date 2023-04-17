@@ -27,7 +27,7 @@ $ lakectl branch create lakefs://sample-repo/my-branch -s lakefs://sample-repo/m
 Within the "sample-repo" repository -> click "Branches" -> click "Create Branch" -> fill in "my-branch" for Branch Name -> click "Create".
 ```
 
-Great! you'v created your first branch, you should now see it in the list of branches!
+Great! you've created your first branch, you should now see it in the list of branches!
 
 Now let's try uploading an object to the `my-branch` branch:
 ```sh

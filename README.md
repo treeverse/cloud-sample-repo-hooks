@@ -1,7 +1,7 @@
 # Welcome to lakeFS Cloud Sample Repository
 
 ## What is lakeFS?
-lakeFS is an open source data version control for data lakes.
+lakeFS is an open source data version control system for data lakes.
 It enables zero copy Dev / Test isolated environments, continuous quality validation, atomic rollback on bad data, reproducibility, and more.
 
 ## Introduction
@@ -29,7 +29,8 @@ Within the "sample-repo" repository -> click "Branches" -> click "Create Branch"
 
 Great! you've created your first branch, you should now see it in the list of branches!
 
-Now let's try uploading an object to the `my-branch` branch:
+Now let's try uploading an object to the `my-branch` branch. Choose or create a local file in any format to test the upload and use its path in place of `/path/to/some/file` below: 
+
 ```sh
 # CLI
 $ lakectl fs upload lakefs://sample-repo/my-branch/file -s /path/to/some/file
@@ -58,13 +59,15 @@ Still within the "my-branch" Uncommitted Changes -> click "Commit Changes" -> cl
 
 Let's explore some data 
 > **_NOTE:_** for this example we'll demonstrate how to query parquet files using `DuckDB` from within the UI.
-```sh
-Within the "sample-repo" repository -> pick the "main" branch from the drop down -> Click the "world-cities-database-population" directory -> Click the "raw" directory -> Click the "part-00000-tid-1091049596617008918-5f8b8e42-730c-4cc2-ba06-3e5f4a4acff6-22194-1-c000.snappy.parquet" parquet file.
-```
 
-Now you should see the parquet file with a standard SQL query displaying the parquet file as table, with it's columns.
+* Within the "sample-repo" repository, pick the "main" branch from the drop down
+* Click the "world-cities-database-population" directory, and the "raw" directory within that
+* Click the "part-00000-tid-1091049596617008918-5f8b8e42-730c-4cc2-ba06-3e5f4a4acff6-22194-1-c000.snappy.parquet" parquet file.
 
-Let's try to get some insights from this parquet, let's try to find out how many people live in the biggest city in each country, replace the SQL query with the one below and click "Execute":
+Now you should see the parquet file with a standard SQL query displaying the parquet file as table, with its columns.
+
+Let's try to get some insights from this parquet, let's try to find out how many people live in the biggest city in each country. Replace the SQL query with the one below and click "Execute":
+
 ```sql
 SELECT 
   country_name_en, max(population) AS biggest_city_pop
@@ -80,9 +83,9 @@ That was cool, wasn't it?
 
 ## Diving Into Hooks
 
-Let's start by trying our first hook, we'll try to upload a file to the `main` branch and commit it.
+Let's start by trying our first hook, which will ensure that certain metadata is present for any commit to the `main` branch. 
 
-Upload a file, make sure to replace `/path/to/some/file` to any arbitrary file you'd like, it can be an empty one for the example:
+Upload a file (you can use the same one as above):
 
 ```sh
 # CLI
